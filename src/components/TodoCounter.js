@@ -2,7 +2,9 @@ import react from "react";
 
 function TodoCounter(props){
     return(
-        <h2>Has compleato {props.counter} de 3 Todos</h2>
+        <react.Fragment>
+            <h2 className="TodoCounter">Has completado {props.CompletedTask} de {props.TasksCount} tareas</h2>
+        </react.Fragment>
     );
 };
 
