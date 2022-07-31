@@ -1,9 +1,13 @@
 import react from "react";
+import { TodoContext } from "../utils/TodoContext";
 
-function TodoCounter(props){
+function TodoCounter(){
+
+    const {CompletedTask,TasksCount} = react.useContext(TodoContext);
+
     return(
         <react.Fragment>
-            <h2 className="TodoCounter">Has completado {props.CompletedTask} de {props.TasksCount} tareas</h2>
+            <h2 className="TodoCounter">Has completado {CompletedTask} de {TasksCount} tareas</h2>
         </react.Fragment>
     );
 };

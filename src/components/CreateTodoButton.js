@@ -1,11 +1,14 @@
 import React from "react";
+import { TodoContext } from "../utils/TodoContext";
 
-function CreateTodoButton(props){
+function CreateTodoButton(){
+
+    const {addtask} = React.useContext(TodoContext)
 
     return(
         <button 
             className="CreateTodoButton"
-            onClick={props.OnAddtask}
+            onClick={addtask}
         >
             X
         </button>
