@@ -1,6 +1,7 @@
 import React from "react";
-import {TodoCounter,TodoSearch,CreateTodoButton,TodoItem,TodoList} from "../components";
-import { TodoContext } from "./TodoContext";
+import {TodoCounter,TodoSearch,TodoButton,TodoItem,TodoList,TodoAdd,TodoError,TodoEmpty,TodoLoading} from "../components";
+import {TodoContext} from "./TodoContext";
+import {Modal} from "./Modal"
 
 function AppUI() {
 
@@ -10,21 +11,27 @@ function AppUI() {
         TasksFilter,
         Tasks,
         completeTask,
-        deleteTask} = React.useContext(TodoContext);
+        deleteTask,
+        ModalValue,windowSize} = React.useContext(TodoContext);
 
     return(
         <React.Fragment>
             <TodoCounter/>
             <TodoSearch/>
             <TodoList>
-            {error && <p>Error en el renderizado</p>}
-            {loading && <p>Renderizando</p>}
-            {(!loading && !Tasks.length) && <p>¡Crea tu primer tarea!</p>}
-            {TasksFilter.map(task => (
-                <TodoItem key={task.key} text={task.text} completed={task.completed} OnDeleteTask={()=> deleteTask(task.key)} OncompleteTask={() => completeTask(task.key)}/>
-            ))}
+                {error && <TodoError msg="Error en el renderizado"/>}
+                {loading && <TodoLoading windowSize={windowSize}/>}
+                {(!loading && !Tasks.length) && <TodoEmpty msg={"¡Crea tu primer tarea!"}/>}
+                {TasksFilter.map(task => (
+                    <TodoItem key={task.key} text={task.text} completed={task.completed} OnDeleteTask={()=> deleteTask(task.key)} OncompleteTask={() => completeTask(task.key)}/>
+                ))}
             </TodoList>
-            <CreateTodoButton/>
+            <TodoButton/>
+            {(!!ModalValue) &&
+                <Modal>
+                    <TodoAdd/>
+                </Modal>
+            }
         </React.Fragment>
     );
 };

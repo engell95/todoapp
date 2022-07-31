@@ -4,6 +4,10 @@ import useLocalStorage from "./useLocalStorage";
 // Al crear el contexto también podemos pasarle un valor inicial entre los paréntesis
 const TodoContext = React.createContext();
 
+function getWindowSize() {
+  const {innerWidth, innerHeight} = window;
+  return {innerWidth, innerHeight};
+}
 
 function TodoProvider(props){
 
@@ -16,6 +20,20 @@ function TodoProvider(props){
       error
     } = useLocalStorage('Task', []);
     const [SearchValue,setSearchValue] = React.useState('');
+    const [ModalValue,setModalValue] = React.useState(false);
+    const [windowSize, setWindowSize] = React.useState(getWindowSize());
+
+    React.useEffect(() => {
+      function handleWindowResize() {
+        setWindowSize(getWindowSize());
+      }
+  
+      window.addEventListener('resize', handleWindowResize);
+  
+      return () => {
+        window.removeEventListener('resize', handleWindowResize);
+      };
+    }, []);
   
     const CompletedTask = Tasks.filter(task => !!task.completed).length;
     const TasksCount = Tasks.length;
@@ -44,12 +62,12 @@ function TodoProvider(props){
       savetask(NewTasks);
     };
   
-    const addtask =()=>{
-      if(!SearchValue.length >= 1){
+    const addtask =(TextValue)=>{
+      if(!TextValue.length >= 1){
         alert('ingrese la tarea para almacenar');
       }
       else{
-        const Newtask = { key:TasksCount + 1,text: SearchValue, completed: false };
+        const Newtask = { key:TasksCount + 1,text: TextValue, completed: false };
         savetask([...Tasks,Newtask]);
         setSearchValue('');
       }
@@ -69,7 +87,9 @@ function TodoProvider(props){
             Tasks,
             completeTask,
             deleteTask,
-            addtask
+            addtask,
+            ModalValue,
+            setModalValue,windowSize
           }}
         >
             {props.children}
