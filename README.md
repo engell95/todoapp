@@ -1,48 +1,35 @@
-using System;
-using System.Configuration;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-
-using Microsoft.IdentityModel.Tokens;
-
-
-using FlujoCoreApiExt.Settings;
-
-namespace FlujoCoreApiExt.Controllers
-{
-    internal static class TokenGenerator
-    {
-        public static string GenerateTokenJwt(string username)
-        {
-            var securityKey = new SymmetricSecurityKey(System.Text.ASCIIEncoding.ASCII.GetBytes(JwtConfig.SecretKey));
-            var signIngCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) });
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var jwtToken = tokenHandler.CreateJwtSecurityToken(
-              subject: claimsIdentity,
-              notBefore: DateTime.UtcNow,
-              expires: DateTime.UtcNow.AddHours(JwtConfig.HourExpirationTime),
-              signingCredentials: signIngCredentials
-
-            );
-
-               var tokenDescriptor = new SecurityTokenDescriptor
+c =>
             {
-                Subject =claimsIdentity,
-                Expires = DateTime.UtcNow.AddHours(JwtConfig.HourExpirationTime),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(System.Text.ASCIIEncoding.ASCII.GetBytes(JwtConfig.SecretKey)), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FlujoCoreApiExt", Version = Program.VersionStr });
 
-            
+                var scheme = new OpenApiSecurityScheme
+                {
+                    Description = "Seguros Lafise Authorization header usando Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                };
 
-            //var jwtTokenStr = tokenHandler.WriteToken(jwtToken);
-            return tokenString;
+                c.AddSecurityDefinition("Bearer", scheme);
 
-        }
-    }
-}
+
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Name = "Bearer",
+                            Type = SecuritySchemeType.ApiKey,
+                            In = ParameterLocation.Header,
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                         },
+                         new string[] {}
+                     }
+                });
+
+            });
